@@ -1,255 +1,152 @@
-# ndotfiles
+# Neovim
 
-Use this repository to customize your envrioment:
-
-- Vim / NeoVim with Vim-Plug
-- Zsh with Oh my zsh
-- Fish with fisher
-
-Use this to customize your bash profile, it comes with :
-
-- set of useful functions and aliases
-- set colorfull shell
-- git config and aliases
-
-Please feel free to install zsh with oh my zsh.
-
-Alternatively, you may want to setp fish instead of zsh and oh my zsh.
-
-For Vim/NeoVim users, you may customize you vimrc with :
-
-- set of plugins
-- set of functions
-- keys mappings
-- colorscheme
-
-You can also add environment specific variables in $HOME/.ndotfiles/bash/.bashrc_vars
-
-## Compatibility
-
-- Windows Git-Bash
-- Mac OS
-- Linux
-
-## Prerequisites
-
-- Homebrew
-
-Homebrew is very handy for MacOS and Linux, to installs the stuff you need in a simple way. It is a package manager for which makes installing lots of different software like Git, Ruby, and Node simpler. Homebrew lets you avoid possible security problems associated with using the sudo command to install software like Node.
-
-Installing Homebrew is straightforward as long as you understand the Mac Terminal.
+# Setup
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
-
-eval "$(/usr/local/bin/brew shellenv)"
-brew update
+brew install neovim
 ```
 
-- Git
-
-You also gonna need git to clone or pull public repositories from github.
+Next we need to install python support:
 
 ```bash
-brew install \
-    git \
-    tig
-
-git config --global core.editor nano
-git config --global user.name 'fullname'
-git config --global user.email 'example@mail.com'
+pip install pynvim
 ```
 
-## Setup
-
-To start with, this ndotfiles repository provides 4 parts :
-
-- bash setup
-- git setup
-- vim/neovim Setup
-- hyper configuration
-- utils files (few scripts not so useful for now)
+alpha live-grep finder will not function without `riggrep`.
 
 ```bash
-curl -L https://raw.githubusercontent.com/newlight77/ndotfiles/main/customize-bash.sh | bash
-curl -L https://raw.githubusercontent.com/newlight77/ndotfiles/main/customize-git.sh | bash
-curl -L https://raw.githubusercontent.com/newlight77/ndotfiles/main/customize-vim.sh | bash
-curl -L https://raw.githubusercontent.com/newlight77/ndotfiles/main/customize-hyper.sh | bash
-curl -L https://raw.githubusercontent.com/newlight77/ndotfiles/main/customize-util.sh | bash
+brew install ripgrep
 ```
 
-### Undo
+`fd` is a program to find entries in your filesystem:
+Alpha requires `fd` to function:
 
 ```bash
-rm -fr /tmp/ndotfiles
-rm -rf $HOME/.ndotfiles/bash
-rm -rf $HOME/.ndotfiles/git
-rm -rf $HOME/.ndotfiles/vim_config
-rm -rf $HOME/.ndotfiles/hyper
-rm -rf $HOME/.ndotfiles/util
+brew install fd
 ```
 
-Then update (by removing ndotfiles related changes source) the .zprofile, .bashrc, .vimrc, .config/nvim/init.vim accordingly.
+## Get healthy
 
-## Hyper
-
-Use Homebrew to download install hyper:
+Open nvim and enter the following:
 
 ```bash
-brew update
-brew install hyper
+:checkhealth 
+:checkhealth telescope
 ```
 
-## Zsh
+## Packer
+
+Neovim supports plugins (called extensions in VS Code). There are quite a few plugin managers : `vim-plug`, `pathogen` and `packer`. Well, so we will use `packer`. 
+
+To get started, clone this repository to somewhere on your packpath:
 
 ```bash
-brew install zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
 ```
 
+## Installing Language Servers for LSP
 
-### iterm2 with Shell Integration
+To use LSP, there are two parts involved. First, we need to install a language server for the language we use. Second, we need to use a plugin that acts as an LSP client that communicates with this server. 
+
+There are quite a few LSP clients out there. Some of the most popular ones are:
+
+- coc.nvim
+- vim-lsp
+- LanguageClient-neovim
+- vim-lsc
+
+LSP and auto-completion support is already configured with required plugins. Neovim built-in LSP client is installed using `nvim-lspconfig`.
+
+Examples of languages support :
 
 ```bash
-curl -L <https://iterm2.com/shell_integration/install_shell_integration_and_utilities.sh> | bash
-curl -L <https://iterm2.com/shell_integration/zsh> -o ~/.iterm2_shell_integration.zsh
+npm install -g pyright
+pip install "python-language-server[all]"
+go get golang.org/x/tools/gopls@latest
 ```
 
-### Theme
+For TypeScript, let’s install `npm install -g typescript-language-server typescript`. You might not need to install typescript globally.
 
-brew install romkatv/powerlevel10k/powerlevel10k
-echo 'source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme' >> ~/.zshrc
+| Keymap       | Effect                   |
+| -            | -                        |
+| gD           | go to Declaration        |
+| gd           | go to definition         |
+| gr           | go to references         |
+| gi           | go to implementations    |
+| K            | Works like "hover" in most text editors that support a mouse. When placed above a function or variable, it will show a tooltip with types and docs. |
+| leader+rn	   | Rename the object that is currently under the cursor. It can be used for renaming functions, variables, etc. |
+| leader D     | Go to type definition.
+| leader ca    | Open a code aaction menu. Quick fixes, refactors, etc. It's the same menu that would be opened by pressing the "lightbulb" in VS Code. |
 
-### Plugins
+## Plugins 
+
+### nvimtree
+
+`nvimtree` is a File Explorer For Neovim. 
+
+Features:
+- Automatic updates
+- File type icons
+- Git integration
+- Diagnostics integration: LSP and COC
+- (Live) filtering
+- Cut, copy, paste, rename, delete, create
+- Highly customisable
+
+### Treesitter
+
+`treesitter` is a parser tool, that builds a hierarchical syntax tree that is used internally by Neovim and various plugins to provide some crucial features like syntax highlighting and others. So let’s make sure to get it out of the way first.
+
+### Auto-completion
+
+The next plugin on our list is responsible for autocompletion. We want to get handy tips and suggestions when we are typing. In our case, cmp will be responsible for that (using the LSPs as the backend).
+
+| Keymap       | Effect  |
+| ctrl+space   | This will open the suggestions box, it works similarly to how VS Code’s autocompletion works. |
+| ctrl+j       | Select next suggestion. |
+| ctrl+k       | Select previous suggestion. |
+| ctrl+d       | Scroll the documentation window down. |
+| ctrl+f       | Scroll the documentation window up. |
+| ctrl+e       | Close the suggestion box (exit). |
+
+### Navigation
+
+All that’s left is making sure we can quickly and easily navigate around our code and between our files. We have a plugin for that too. I use telescope with ripgrep as a backend for searching through my codebases.
+
+However, some of them will require ripgrep to be installed on your system. On macOS, you can install it via `brew install ripgrep`.
+
+| Keymap          | Effect |
+| leader space    | Opens the telescope UI and searches through the names of your open buffers. In other words — use this to jump between your open files. |
+| leader sf       | Search through project files. Telescope will search through the names of all the files in the current directory. Useful to open new files. |
+| leader sp       | Search in the whole project. Works like SHIFT+F in other text editors. |
+
+### Git
+
+The last plugin we’ll configure is the gitsigns plugin. This will add great-looking git information in near the line numbers about whether a line was added, changed or modified. I find that particularly useful.
+
+## Debug
+
+`nvim-dap-python` uses `debugpy` so let’s install it:
 
 ```bash
-brew install zsh-completions
-
-echo "
-if type brew &>/dev/null; then
-    FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
-
-    autoload -Uz compinit
-    compinit
-  fi
-" >> ~/.zprofile
-
-brew install zsh-syntax-highlighting
-echo 'source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh' >> ~/.zprofile
-
-brew install zsh-autosuggestions
-echo "source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh" >> ~/.zprofile
-
-brew install zsh-history-substring-search
-echo 'source /usr/local/share/zsh-history-substring-search/zsh-history-substring-search.zsh' >> ~/.zprofile
-
-brew install zsh-syntax-highlighting
-echo 'source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh' >> ~/.zprofile
-
-sed -i -e "/plugins=(git)/plugins=(alias-finder brew common-aliases copydir copyfile docker docker-compose dotenv encode64 extract git jira jsontools node npm npx osx urltools vi-mode vscode web-search z)/g" ~/.zshrc
+pip install debugpy
 ```
-
-### Vim / NeoVim
-
-Please refer to ./vim/readme.md or ./nvim/readme.md.
 
 ### Vim Cheat Sheet
 
 [Vim Cheat Sheet](https://vim.rtorr.com/)
 
-## SSH
-
-## Git
-
-```bash
-Git
-brew install \
-    git \
-    tig
-
-git config --global core.editor nano
-git config --global user.name 'fullname'
-git config --global user.email 'example@mail.com'
-```
-
-## Github
-
-```bash
-echo '
-machine api.github.com
-login <user>
-password <token>
-' >> ~/.netrc
-```
-
-Github requires a personal access token, a gpg key, and a ssh key.
-
-Generate GPG Key:
-
-```bash
-gpg --gen-key
-#which will prompt you for name, email and secret.
-```
-
-Now encrypt it using the gpg key, where <EMAIL> is the address you used when creating the key
-
-```bash
-gpg -e -r <EMAIL> ~/.netrc
-```
-
-### Github enterprise
-
-If you want to access github entreprise on premiss, set this in vimrc :
-
-```bash
-let g:github_enterprise_urls = ['https://example.com']
-```
-
-### git credentials using git-credential-netrc (optional)
-
-Note : This step is already covered by customize-git.sh.
-
-You gonna need a credential helper to decrypt the .netrc file automatically by git:
-
-```bash
-echo "creating folder $HOME/.ndotfiles/util" 1>&2
-mkdir $HOME/.ndotfiles/util/
-
-echo "retrieve the git-credential-netrc from github"
-curl -o $HOME/.ndotfiles/util/git-credential-netrc https://raw.githubusercontent.com/git/git/master/contrib/credential/netrc/git-credential-netrc.perl
-chmod +x $HOME/.ndotfiles/util/git-credential-netrc
-
-echo "adding export GPG_TTY and add git-credential-netrc to PATH in $HOME/.zshrc" 1>&2
-echo '
-# ===================================================================
-# added by https://github.com/newlight77/ndotfiles
-export PATH=$HOME/.ndotfiles/util/:$PATH
-export GPG_TTY=$(tty)
-# ===================================================================
-' >> $HOME/.zshrc
-```
-
-At last, configure git to use credential helper
-
-```bash
-git config --global credential.helper "netrc -f ~/.netrc.gpg -v"
-# automatically sign commits
-git config --global commit.gpgsign true
-```
-
 ## Reference
 
-- [iterm2 shell-integration](https://iterm2.com/documentation-shell-integration.html)
-- [oh my zsh](https://ohmyz.sh/)
-- [bash-it](https://github.com/Bash-it/bash-it)
-- [How to Configure your macOs Terminal with Zsh like a Pro](https://www.freecodecamp.org/news/how-to-configure-your-macos-terminal-with-zsh-like-a-pro-c0ab3f3c1156/)
-
-- [neovim](https://neovim.io/)
-- [vimrc](https://github.com/amix/vimrc)
-- [vim awesome](https://vimawesome.com/)
-- [vimrc example](https://github.com/gerardbm/vimrc)
-- [How to set up Neovim 0.5 + Modern plugins (LSP, Treesitter, Fuzzy finder, etc)](https://blog.inkdrop.app/how-to-set-up-neovim-0-5-modern-plugins-lsp-treesitter-etc-542c3d9c9887)
-
-- [Hyper](https://hyper.is/#installation)
-- [Hyper awesome](https://github.com/bnb/awesome-hyper)
+- [install neovim](https://github.com/neovim/neovim/wiki/Installing-Neovim#install-from-package)
+- [packer](https://github.com/wbthomason/packer.nvim)
+- [neovimcraft](http://neovimcraft.com/)
+- [Enhance your neovim workflow](https://nvchad.github.io/)
+- [Neovim from scratch](https://github.com/LunarVim/Neovim-from-scratch)
+- [Top neovim plugins 2022](https://hannadrehman.com/top-neovim-plugins-for-developers-in-2022)
+- [Guide to modern Neovim setup, 2021](https://tkg.codes/guide-to-modern-neovim-setup-2021/)
+- [Neovim setting up snippets with luasnip](https://sbulav.github.io/vim/neovim-setting-up-luasnip/)
+- [dotfiles from shubmehetre](https://github.com/shubmehetre/dotfiles)
+- [From init.vim to init.lua](https://www.notonlycode.org/neovim-lua-config/)
+- [neovim-startup-screen](https://alpha2phi.medium.com/neovim-startup-screen-edd933ec8261)
+- [Nvim configuration by jdhao](https://github.com/jdhao/nvim-config)
