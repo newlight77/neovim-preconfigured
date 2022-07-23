@@ -12,6 +12,12 @@ Next we need to install python support:
 pip install pynvim
 ```
 
+Install language server for python:
+
+```bash
+pip3 install 'python-lsp-server[all]'
+```
+
 alpha live-grep finder will not function without `riggrep`.
 
 ```bash
@@ -150,3 +156,5 @@ pip install debugpy
 - [From init.vim to init.lua](https://www.notonlycode.org/neovim-lua-config/)
 - [neovim-startup-screen](https://alpha2phi.medium.com/neovim-startup-screen-edd933ec8261)
 - [Nvim configuration by jdhao](https://github.com/jdhao/nvim-config)
+- [A Complete Guide to Neovim Configuration for Python Development](https://jdhao.github.io/2018/12/24/centos_nvim_install_use_guide_en/)
+- [LSP servers](https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md)
